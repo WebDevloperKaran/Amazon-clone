@@ -6,11 +6,12 @@ import { Link, useHistory } from "react-router-dom";
 import { useElements, useStripe, CardElement } from "@stripe/react-stripe-js";
 import CurrencyFormat from "react-currency-format";
 import { getBasketTotal } from "./reducer";
-import axios from "axios";
+import axios from "./axios";
 
 function Payment() {
-  const [{ basket, user }, dispatch] = useStateValue();
   const history = useHistory();
+  const [{ user, basket }, dispatch] = useStateValue();
+
   const stripe = useStripe();
   const elements = useElements();
 
@@ -24,18 +25,17 @@ function Payment() {
     const getClientSecret = async () => {
       const response = await axios({
         method: "post",
-        // Strip epects the total in a currences subunits
         url: `/payments/create?total=${getBasketTotal(basket) * 100}`,
       });
       setClientSecret(response.data.clientSecret);
     };
+
     getClientSecret();
   }, [basket]);
 
-  console.log("The Secret is >>>", clientSecret);
+  console.log("This is Secret", clientSecret);
 
   const handleSubmit = async (event) => {
-    // handling
     event.preventDefault();
     setProcessing(true);
 
@@ -110,7 +110,7 @@ function Payment() {
                   prefix={"$"}
                 />
                 <button disabled={processing || disabled || succeeded}>
-                  <span> {processing ? <p>Processomg</p> : "Buy Now"}</span>
+                  <span> {processing ? <p>Processing</p> : "Buy Now"}</span>
                 </button>
               </div>
               {/* Errors */}
